@@ -16,179 +16,288 @@ const sequelize = require('../../db/db_sequelize');
 // ************************
 // Metodo que inicia sesión
 // ************************
-async function login(params) {
-console.log(params)
+// async function login(params) {
+// console.log(params)
 
-    let data;
-    //sconst params = req.body;
-    // const usuario = await base_usuarios.findOne({
-    //     attributes: ['id','nombres','apellidos','rol','password','estado','email','ocupacion'],
-    //     where: {
-    //         email: params.email,
-    //         estado: 1,
-    //     }
-    // });
-    const usuario = await sequelize.query(
-        `
-        select *
-         from usuarios,profesiones WHERE estado = 1 AND email='${params.email}'  and ocupacion = id_pro 
-        `,
-        {
-            replacements: {
+//     let data;
+//     //sconst params = req.body;
+//     // const usuario = await base_usuarios.findOne({
+//     //     attributes: ['id','nombres','apellidos','rol','password','estado','email','ocupacion'],
+//     //     where: {
+//     //         email: params.email,
+//     //         estado: 1,
+//     //     }
+//     // });
+//     const usuario = await sequelize.query(
+//         `
+//         select *
+//          from usuarios,profesiones WHERE estado = 1 AND email='${params.email}'  and ocupacion = id_pro 
+//         `,
+//         {
+//             replacements: {
                
-            },
-            type: QueryTypes.SELECT
-        }
-    );
-    console.log(usuario[0][0]);
-    let datos =usuario[0][0];
-    if (datos) {
-        try {
+//             },
+//             type: QueryTypes.SELECT
+//         }
+//     );
+//     console.log(usuario[0][0]);
+//     let datos =usuario[0][0];
+//     if (datos) {
+//         try {
             
             
-       let password = params.password;
-    //    checkUser(params.correo,params.password)
+//        let password = params.password;
+//     //    checkUser(params.correo,params.password)
     
-    //    async function checkUser(username, password) {
-    //     //... fetch user from a db etc.
+//     //    async function checkUser(username, password) {
+//     //     //... fetch user from a db etc.
     
-    //     const match = await bcrypt.compare(password, password1);
+//     //     const match = await bcrypt.compare(password, password1);
     
-    //     if(match) {
-    //         console.log('si es ')//login
-    //     }
+//     //     if(match) {
+//     //         console.log('si es ')//login
+//     //     }
     
-    //     //...
-    // }
-    const match = await bcrypt.compare(password, datos.password);
-            // data = await base_usuarios.create({
-            //     //idusuario: params.idusuario,
+//     //     //...
+//     // }
+//     const match = await bcrypt.compare(password, datos.password);
+//             // data = await base_usuarios.create({
+//             //     //idusuario: params.idusuario,
                
-            //     email: params.correo,
-            //     password:password,
-            //     rol:params.rol,
-            //     estado: 0,
-            //     //confirmado: 0, // Por default no está confirmado el usuario
-            //     token:null,
-            //     //cUsuario_Registro: 'SA',
-            //      fecha_modificacion: new Date(),
-            //     fecha_creacion: new Date()
-            // });
+//             //     email: params.correo,
+//             //     password:password,
+//             //     rol:params.rol,
+//             //     estado: 0,
+//             //     //confirmado: 0, // Por default no está confirmado el usuario
+//             //     token:null,
+//             //     //cUsuario_Registro: 'SA',
+//             //      fecha_modificacion: new Date(),
+//             //     fecha_creacion: new Date()
+//             // });
     
-            if (match != '') {
-                const token = auth.createToken(usuario.email);
+//             if (match != '') {
+//                 const token = auth.createToken(usuario.email);
 
-                const dataLogin = {
-                    idToken: token,
-                    nombre:datos.nombres,
-                    apellido:datos.apellidos,
-                    usuario: datos.email,
-                    rol: datos.rol,
-                    activo:datos.estado,
-                    ocupacion:datos.descripcion
-                };
+//                 const dataLogin = {
+//                     idToken: token,
+//                     nombre:datos.nombres,
+//                     apellido:datos.apellidos,
+//                     usuario: datos.email,
+//                     rol: datos.rol,
+//                     activo:datos.estado,
+//                     ocupacion:datos.descripcion
+//                 };
                
-                return {
-                    status: 200,
-                    error: '',
-                    data:dataLogin,
-                };
-            } else {
-                return {
-                    status: 400,
-                    error: 'Error al crear la cuenta',
-                    data,
-                };
-            }
+//                 return {
+//                     status: 200,
+//                     error: '',
+//                     data:dataLogin,
+//                 };
+//             } else {
+//                 return {
+//                     status: 400,
+//                     error: 'Error al crear la cuenta',
+//                     data,
+//                 };
+//             }
     
-        } catch (err) {
-            // do something
-            return {
-                status: 500,
-                error: err,
-                data: [],
-            }
-        }
-    } else{
-        return {
-            status: 400,
-            error: 'Usuario no existe',
-            data:'Usuario no existe',
-        };
-    }
+//         } catch (err) {
+//             // do something
+//             return {
+//                 status: 500,
+//                 error: err,
+//                 data: [],
+//             }
+//         }
+//     } else{
+//         return {
+//             status: 400,
+//             error: 'Usuario no existe',
+//             data:'Usuario no existe',
+//         };
+//     }
    
 
-    // try {
+//     // try {
 
-    //     const usuario = await base_usuarios.findOne({
-    //         attributes: ['email','rol','password'],
-    //         where: {
-    //             email: params.correo,
-    //             estado: 1
-    //         }
-    //     });
+//     //     const usuario = await base_usuarios.findOne({
+//     //         attributes: ['email','rol','password'],
+//     //         where: {
+//     //             email: params.correo,
+//     //             estado: 1
+//     //         }
+//     //     });
 
-    //     if (usuario) {
+//     //     if (usuario) {
 
-    //         let username= usuario.email;
-    //         let tipoMembresia = null
-    //         let membresiaVence = null;
+//     //         let username= usuario.email;
+//     //         let tipoMembresia = null
+//     //         let membresiaVence = null;
 
-    //         checkUser(username,params.password)
+//     //         checkUser(username,params.password)
 
-    //         async function checkUser(username, password) {
-    //          //... fetch user from a db etc.
+//     //         async function checkUser(username, password) {
+//     //          //... fetch user from a db etc.
          
-    //          const match = await bcrypt.compare(password,usuario.password);
+//     //          const match = await bcrypt.compare(password,usuario.password);
          
-    //          if(match) {
-    //              console.log('si es ')//login
-    //              let data ={
-    //                 status: 200,
-    //                 error: '',
-    //                 usuario,
-    //              }
-    //              return {
-    //                 data
+//     //          if(match) {
+//     //              console.log('si es ')//login
+//     //              let data ={
+//     //                 status: 200,
+//     //                 error: '',
+//     //                 usuario,
+//     //              }
+//     //              return {
+//     //                 data
                    
-    //             };
-    //          }
-    //          else {
-    //             //Guardamos en el log
-    //             // Log.guardar(
-    //             //     usuario.nIdUsuario,
-    //             //     1,
-    //             //     'Problema en el login del usuario'
-    //             // );
-    //             return {
-    //                 status: 401,
-    //                 error: 'Password invalido ',
-    //                 data,
-    //             };
-    //         }
-    //          //...
-    //      }
+//     //             };
+//     //          }
+//     //          else {
+//     //             //Guardamos en el log
+//     //             // Log.guardar(
+//     //             //     usuario.nIdUsuario,
+//     //             //     1,
+//     //             //     'Problema en el login del usuario'
+//     //             // );
+//     //             return {
+//     //                 status: 401,
+//     //                 error: 'Password invalido ',
+//     //                 data,
+//     //             };
+//     //         }
+//     //          //...
+//     //      }
 
             
-    //     } else {
-    //         return {
-    //             status: 400,
-    //             error: 'Correo de usuario no existe',
-    //             data,
-    //         };
-    //     }
+//     //     } else {
+//     //         return {
+//     //             status: 400,
+//     //             error: 'Correo de usuario no existe',
+//     //             data,
+//     //         };
+//     //     }
 
-    // } catch (err) {
-    //     // do something
-    //     return {
-    //         status: 500,
-    //         error: err,
-    //         data: [],
-    //     };
-    // }
+//     // } catch (err) {
+//     //     // do something
+//     //     return {
+//     //         status: 500,
+//     //         error: err,
+//     //         data: [],
+//     //     };
+//     // }
 
     
-}
+// }
+async function login(params) {
+    console.log(params)
+    
+        let data;
+        //sconst params = req.body;
+        // const usuario = await base_usuarios.findOne({
+        //     attributes: ['id','nombres','apellidos','rol','password','estado','email','ocupacion'],
+        //     where: {
+        //         email: params.email,
+        //         estado: 1,
+        //     }
+        // });
+        const usuario = await sequelize.query(
+            `
+            select *
+             from Usuarios WHERE tipo_usuario = 1 AND correo_usuario='${params.email}'  AND contraseña_usuario='${params.password}' 
+            `,
+            {
+                replacements: {
+                   
+                },
+                type: QueryTypes.SELECT
+            }
+        );
+        console.log(usuario[0][0]);
+        let datos =usuario[0][0];
+        if (datos) {
+            try {
+                
+                
+         //  let password = params.password;
+        //    checkUser(params.correo,params.password)
+        
+        //    async function checkUser(username, password) {
+        //     //... fetch user from a db etc.
+        
+        //     const match = await bcrypt.compare(password, password1);
+        
+        //     if(match) {
+        //         console.log('si es ')//login
+        //     }
+        
+        //     //...
+        // }
+        //const match = await bcrypt.compare(password, datos.password);
+                // data = await base_usuarios.create({
+                //     //idusuario: params.idusuario,
+                   
+                //     email: params.correo,
+                //     password:password,
+                //     rol:params.rol,
+                //     estado: 0,
+                //     //confirmado: 0, // Por default no está confirmado el usuario
+                //     token:null,
+                //     //cUsuario_Registro: 'SA',
+                //      fecha_modificacion: new Date(),
+                //     fecha_creacion: new Date()
+                // });
+                return {
+                  status: 200,
+                  error: '',
+                  data:datos,
+              };
+                // if (match != '') {
+                //     const token = auth.createToken(usuario.email);
+    
+                //     const dataLogin = {
+                //         idToken: token,
+                //         nombre:datos.nombres,
+                //         apellido:datos.apellidos,
+                //         usuario: datos.email,
+                //         rol: datos.rol,
+                //         activo:datos.estado,
+                //         ocupacion:datos.descripcion
+                //     };
+                   
+                //     return {
+                //         status: 200,
+                //         error: '',
+                //         data:dataLogin,
+                //     };
+                // } else {
+                //     return {
+                //         status: 400,
+                //         error: 'Error al crear la cuenta',
+                //         data,
+                //     };
+                // }
+        
+            } catch (err) {
+                // do something
+                return {
+                    status: 500,
+                    error: err,
+                    data: [],
+                }
+            }
+        } else{
+            return {
+                status: 400,
+                error: 'Usuario no existe',
+                data:'Usuario no existe',
+            };
+        }
+       
+    
+    
+        
+    }
   // ************************
   // Metodo que obtiene el tipo de membresia
   // ************************
