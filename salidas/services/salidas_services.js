@@ -4,7 +4,7 @@
 const base_salidas = require('../../models/salidas');
 const sequelize = require('../../db/db_sequelize');
 const QueryTypes = require('sequelize');
-const base_salidas = require('../../models/salidas');
+
 
 // Obtener Salidas(GET)
 async function getAllSalidas(req) {
@@ -68,44 +68,38 @@ async function postSalidas(req) {
 }
 }
 
-// Actualizar Salidas(PUT)
-async function putSalidas(id,params) {
-    const params = req.body;
-    const id = req.params.id; 
+// Actualizar Salidas(PUT) "arreglado y reconfigurado"
+async function putSalidas(nSalidas, params) {
+    try {
+        const data = await base_salidas.update({
+            bidon_id: params.bidon_id,
+            cantidad: params.cantidad,
+            fecha_ingreso: params.fecha_ingreso,
+            deleted_at: params.deleted_at,
+            created_at: params.created_at,
+            updated_at: params.updated_at,
+        }, { where: { nSalidas: nSalidas, bActivo:1  } });
 
-
-try {
-    const data = await base_salidas.update(
-    {
-        bidon_id: params.bidon_id,
-        cantidad: params.cantidad,
-        fecha_ingreso: params.fecha_ingreso,
-        deleted_at: params.deleted_at,
-        created_at: params.created_at,
-        updated_at: params.updated_at
-    },
-    { where: { id: params.codigo } });
-
-    if (data === null || data.length < 1) {
+        if (data === null || data.length < 1) {
+            return {
+                status: 500,
+                error: "Problema al actualizar salidas, verifique la informacion.",
+                data,
+            };
+        } else {
+            return {
+                status: 200,
+                error: "",
+                data:  data,
+            };
+        }
+    } catch (err) {
         return {
             status: 500,
-            error: "Problema al actualizar las salidas.",
-            data,
-        };
-    } else {
-        return {
-            status: 200,
-            error: "",
-            data:  data,
+            error: err,
+            data: err
         };
     }
-} catch (err) {
-    return {
-        status: 500,
-        error: err,
-        data: err
-    };
-}
 }
 
 // Eliminar Salidas(DELETE)

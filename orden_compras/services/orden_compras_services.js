@@ -4,7 +4,7 @@
 const base_orden_compras = require('../../models/orden_compras');
 const sequelize = require('../../db/db_sequelize');
 const QueryTypes = require('sequelize');
-const base_orden_compras = require('../../models/orden_compras');
+
 
 // Obtener Orden_compras(GET)
 async function getAllOrden_compras(req) {
@@ -69,45 +69,39 @@ async function postOrden_compras(req) {
 }
 }
 
-// Actualizar Orden_compras(PUT)
-async function putOrden_compras(id,params) {
-    const params = req.body;
-    const id = req.params.id; 
+// Actualizar Orden_compras(PUT) "arreglado y reconfigurado"
+async function putOrden_compras(nOrden_compras, params) {
+    try {
+        const data = await base_orden_compras.update({
+            cierre_id: params.cierre_id,
+            fecha: params.fecha,
+            folio: params.folio,
+            monto: params.monto,
+            documento: params.documento,
+            created_at: params.created_at,
+            updated_at: params.updated_at,
+        }, { where: { nOrden_compras: nOrden_compras, bActivo:1  } });
 
-
-try {
-    const data = await base_orden_compras.update(
-    {
-        cierre_id: params.cierre_id,
-        fecha: params.fecha,
-        folio: params.folio,
-        monto: params.monto,
-        documento: params.documento,
-        created_at: params.created_at,
-        updated_at: params.updated_at
-    },
-    { where: { id: params.codigo } });
-
-    if (data === null || data.length < 1) {
+        if (data === null || data.length < 1) {
+            return {
+                status: 500,
+                error: "Problema al actualizar orden de compra, verifique la informacion.",
+                data,
+            };
+        } else {
+            return {
+                status: 200,
+                error: "",
+                data:  data,
+            };
+        }
+    } catch (err) {
         return {
             status: 500,
-            error: "Problema al actualizar la orden de compra.",
-            data,
-        };
-    } else {
-        return {
-            status: 200,
-            error: "",
-            data:  data,
+            error: err,
+            data: err
         };
     }
-} catch (err) {
-    return {
-        status: 500,
-        error: err,
-        data: err
-    };
-}
 }
 
 // Eliminar Orden_compras(DELETE)

@@ -69,46 +69,40 @@ async function postEntradas(req) {
 }
 }
 
-// Actualizar Entradas(PUT)
-async function putEntradas(id,params) {
-    const params = req.body;
-    const id = req.params.id; 
+// Actualizar Entradas(PUT) "arreglado y reconfigurado"
+async function putEntradas(nEntradas, params) {
+    try {
+        const data = await base_entradas.update({
+            bidon_id: params.bidon_id,
+            cantidad: params.cantidad,
+            fecha_ingreso: params.fecha_ingreso,
+            fecha_documento: params.fecha_documento,
+            folio_documento: params.folio_documento,
+            deleted_at: params.deleted_at,
+            created_at: params.created_at,
+            updated_at: params.updated_at,
+        }, { where: { nEntradas: nEntradas, bActivo:1  } });
 
-
-try {
-    const data = await base_entradas.update(
-    {
-        bidon_id: params.bidon_id,
-        cantidad: params.cantidad,
-        fecha_ingreso: params.fecha_ingreso,
-        fecha_documento: params.fecha_documento,
-        folio_documento: params.folio_documento,
-        deleted_at: params.deleted_at,
-        created_at: params.created_at,
-        updated_at: params.updated_at
-    },
-    { where: { id: params.codigo } });
-
-    if (data === null || data.length < 1) {
+        if (data === null || data.length < 1) {
+            return {
+                status: 500,
+                error: "Problema al actualizar entradas, verifique la informacion.",
+                data,
+            };
+        } else {
+            return {
+                status: 200,
+                error: "",
+                data:  data,
+            };
+        }
+    } catch (err) {
         return {
             status: 500,
-            error: "Problema al actualizar la entrada.",
-            data,
-        };
-    } else {
-        return {
-            status: 200,
-            error: "",
-            data:  data,
+            error: err,
+            data: err
         };
     }
-} catch (err) {
-    return {
-        status: 500,
-        error: err,
-        data: err
-    };
-}
 }
 
 // Eliminar Entradas(DELETE)

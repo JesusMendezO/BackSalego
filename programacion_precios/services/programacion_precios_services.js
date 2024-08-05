@@ -4,7 +4,7 @@
 const base_programacion_precios = require('../../models/programacion_precios');
 const sequelize = require('../../db/db_sequelize');
 const QueryTypes = require('sequelize');
-const base_programacion_precios = require('../../models/programacion_precios');
+
 
 // Obtener Programacion_precios(GET)
 async function getAllProgramacion_precios(req) {
@@ -48,7 +48,7 @@ async function postProgramacion_precios(req) {
         empresa_id: params.empresa_id,
         precios: params.precios,
         fecha: params.fecha,
-        realizado: params.real
+        realizado: params.realizado
     }),
     console.log(data);
     return {
@@ -66,42 +66,36 @@ async function postProgramacion_precios(req) {
 }
 }
 
-// Actualizar Programacion_precios(PUT)
-async function putProgramacion_precios(id,params) {
-    const params = req.body;
-    const id = req.params.id; 
+// Actualizar Programacion_precios(PUT) "arreglado y reconfigurado"
+async function putProgramacion_precios(nProgramacion_precios, params) {
+    try {
+        const data = await base_programacion_precios.update({
+            empresa_id: params.empresa_id,
+            precios: params.precios,
+            fecha: params.fecha,
+            realizado: params.realizado,
+        }, { where: { nProgramacion_precios: nProgramacion_precios, bActivo:1  } });
 
-
-try {
-    const data = await base_programacion_precios.update(
-    {
-        empresa_id: params.empresa_id,
-        precios: params.precios,
-        fecha: params.fecha,
-        realizado: params.real
-    },
-    { where: { id: params.codigo } });
-
-    if (data === null || data.length < 1) {
+        if (data === null || data.length < 1) {
+            return {
+                status: 500,
+                error: "Problema al actualizar programacion precios, verifique la informacion.",
+                data,
+            };
+        } else {
+            return {
+                status: 200,
+                error: "",
+                data:  data,
+            };
+        }
+    } catch (err) {
         return {
             status: 500,
-            error: "Problema al actualizar la programacion de precios.",
-            data,
-        };
-    } else {
-        return {
-            status: 200,
-            error: "",
-            data:  data,
+            error: err,
+            data: err
         };
     }
-} catch (err) {
-    return {
-        status: 500,
-        error: err,
-        data: err
-    };
-}
 }
 
 // Eliminar Programacion_precios(DELETE)

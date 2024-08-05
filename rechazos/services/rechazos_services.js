@@ -4,7 +4,7 @@
 const base_rechazos = require('../../models/rechazos');
 const sequelize = require('../../db/db_sequelize');
 const QueryTypes = require('sequelize');
-const base_rechazos = require('../../models/rechazos');
+
 
 // Obtener Rechazos(GET)
 async function getAllRechazos(req) {
@@ -70,46 +70,40 @@ async function postRechazos(req) {
 }
 }
 
-// Actualizar Rechazos(PUT)
-async function putRechazos(id,params) {
-    const params = req.body;
-    const id = req.params.id; 
+// Actualizar Rechazos(PUT) "arreglado y reconfigurado"
+async function putRechazos(nRechazos, params) {
+    try {
+        const data = await base_rechazos.update({
+            guia_despacho_id: params.guia_despacho_id,
+            producto_id: params.producto_id,
+            motivo: params.motivo,
+            created_at: params.created_at,
+            updated_at: params.updated_at,
+            deleted_at: params.deleted_at,
+            estado_pago: params.estado_pago,
+            cierre: params.cierre,
+        }, { where: { nRechazos: nRechazos, bActivo:1  } });
 
-
-try {
-    const data = await base_rechazos.update(
-    {
-        guia_despacho_id: params.guia_despacho_id,
-        producto_id: params.producto_id,
-        motivo: params.motivo,
-        created_at: params.created_at,
-        updated_at: params.updated_at,
-        deleted_at: params.deleted_at,
-        estado_pago: params.estado_pago,
-        cierre: params.cierre
-    },
-    { where: { id: params.codigo } });
-
-    if (data === null || data.length < 1) {
+        if (data === null || data.length < 1) {
+            return {
+                status: 500,
+                error: "Problema al actualizar rechazos, verifique la informacion.",
+                data,
+            };
+        } else {
+            return {
+                status: 200,
+                error: "",
+                data:  data,
+            };
+        }
+    } catch (err) {
         return {
             status: 500,
-            error: "Problema al actualizar el rechazo.",
-            data,
-        };
-    } else {
-        return {
-            status: 200,
-            error: "",
-            data:  data,
+            error: err,
+            data: err
         };
     }
-} catch (err) {
-    return {
-        status: 500,
-        error: err,
-        data: err
-    };
-}
 }
 
 // Eliminar Rechazos(DELETE)

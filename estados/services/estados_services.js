@@ -4,7 +4,7 @@
 const base_estados = require('../../models/estados');
 const sequelize = require('../../db/db_sequelize');
 const QueryTypes = require('sequelize');
-const base_estados = require('../../models/estados');
+
 
 // Obtener Estados(GET)
 async function getAllEstados(req) {
@@ -66,42 +66,36 @@ async function postEstados(req) {
 }
 }
 
-// Actualizar Estados(PUT)
-async function putEstados(id,params) {
-    const params = req.body;
-    const id = req.params.id; 
+// Actualizar Estados(PUT) "arreglado y reconfigurado"
+async function putEstados(nEstados, params) {
+    try {
+        const data = await base_estados.update({
+            nombre: params.nombre,
+            deleted_at: params.deleted_at,
+            created_at: params.created_at,
+            updated_at: params.updated_at,
+        }, { where: { nEstados: nEstados, bActivo:1  } });
 
-
-try {
-    const data = await base_estados.update(
-    {
-        nombre: params.nombre,
-        deleted_at: params.deleted_at,
-        created_at: params.created_at,
-        updated_at: params.updated_at
-    },
-    { where: { id: params.codigo } });
-
-    if (data === null || data.length < 1) {
+        if (data === null || data.length < 1) {
+            return {
+                status: 500,
+                error: "Problema al actualizar estados, verifique la informacion.",
+                data,
+            };
+        } else {
+            return {
+                status: 200,
+                error: "",
+                data:  data,
+            };
+        }
+    } catch (err) {
         return {
             status: 500,
-            error: "Problema al actualizar el estado.",
-            data,
-        };
-    } else {
-        return {
-            status: 200,
-            error: "",
-            data:  data,
+            error: err,
+            data: err
         };
     }
-} catch (err) {
-    return {
-        status: 500,
-        error: err,
-        data: err
-    };
-}
 }
 
 // Eliminar Estados(DELETE)

@@ -4,7 +4,7 @@
 const base_password_resets = require('../../models/password_resets');
 const sequelize = require('../../db/db_sequelize');
 const QueryTypes = require('sequelize');
-const base_password_resets = require('../../models/password_resets');
+
 
 // Obtener Password_resets(GET)
 async function getAllPassword_resets(req) {
@@ -65,41 +65,35 @@ async function postPassword_resets(req) {
 }
 }
 
-// Actualizar Password_resets(PUT)
-async function putPassword_resets(id,params) {
-    const params = req.body;
-    const id = req.params.id; 
+// Actualizar Password_resets(PUT) "arreglado y reconfigurado"
+async function putPassword_resets(nPassword_resets, params) {
+    try {
+        const data = await base_password_resets.update({
+            email: params.email,
+            token: params.token,
+            created_at: params.created_at,
+        }, { where: { nPassword_resets: nPassword_resets, bActivo:1  } });
 
-
-try {
-    const data = await base_password_resets.update(
-    {
-        email: params.email,
-        token: params.token,
-        created_at: params.created_at
-    },
-    { where: { id: params.codigo } });
-
-    if (data === null || data.length < 1) {
+        if (data === null || data.length < 1) {
+            return {
+                status: 500,
+                error: "Problema al actualizar password resets, verifique la informacion.",
+                data,
+            };
+        } else {
+            return {
+                status: 200,
+                error: "",
+                data:  data,
+            };
+        }
+    } catch (err) {
         return {
             status: 500,
-            error: "Problema al actualizar el password_resets.",
-            data,
-        };
-    } else {
-        return {
-            status: 200,
-            error: "",
-            data:  data,
+            error: err,
+            data: err
         };
     }
-} catch (err) {
-    return {
-        status: 500,
-        error: err,
-        data: err
-    };
-}
 }
 
 // Eliminar Password_resets(DELETE)

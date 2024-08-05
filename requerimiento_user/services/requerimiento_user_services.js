@@ -4,7 +4,7 @@
 const base_requerimiento_user = require('../../models/requerimiento_user');
 const sequelize = require('../../db/db_sequelize');
 const QueryTypes = require('sequelize');
-const base_requerimiento_user = require('../../models/requerimiento_user');
+
 
 // Obtener Requerimiento_user(GET)
 async function getAllRequerimiento_user(req) {
@@ -67,43 +67,37 @@ async function postRequerimiento_user(req) {
 }
 }
 
-// Actualizar Requerimiento_user(PUT)
-async function putRequerimiento_user(id,params) {
-    const params = req.body;
-    const id = req.params.id; 
+// Actualizar Requerimiento_user(PUT) "arreglado y reconfigurado"
+async function putRequerimiento_user(nRequerimiento_user, params) {
+    try {
+        const data = await base_requerimiento_user.update({
+            user_id: params.user_id,
+            requerimiento_id: params.requerimiento_id,
+            nombre: params.nombre,
+            created_at: params.created_at,
+            updated_at: params.updated_at,
+        }, { where: { nRequerimiento_user: nRequerimiento_user, bActivo:1  } });
 
-
-try {
-    const data = await base_requerimiento_user.update(
-    {
-        user_id: params.user_id,
-        requerimiento_id: params.requerimiento_id,
-        nombre: params.nombre,
-        created_at: params.created_at,
-        updated_at: params.updated_at
-    },
-    { where: { id: params.codigo } });
-
-    if (data === null || data.length < 1) {
+        if (data === null || data.length < 1) {
+            return {
+                status: 500,
+                error: "Problema al actualizar requerimiento user, verifique la informacion.",
+                data,
+            };
+        } else {
+            return {
+                status: 200,
+                error: "",
+                data:  data,
+            };
+        }
+    } catch (err) {
         return {
             status: 500,
-            error: "Problema al actualizar el requerimiento_user.",
-            data,
-        };
-    } else {
-        return {
-            status: 200,
-            error: "",
-            data:  data,
+            error: err,
+            data: err
         };
     }
-} catch (err) {
-    return {
-        status: 500,
-        error: err,
-        data: err
-    };
-}
 }
 
 // Eliminar Requerimiento_user(DELETE)

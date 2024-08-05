@@ -4,7 +4,7 @@
 const base_requerimientos = require('../../models/requerimientos');
 const sequelize = require('../../db/db_sequelize');
 const QueryTypes = require('sequelize');
-const base_requerimientos = require('../../models/requerimientos');
+
 
 // Obtener Requerimientos(GET)
 async function getAllRequerimientos(req) {
@@ -73,49 +73,43 @@ async function postRequerimientos(req) {
 }
 }
 
-// Actualizar Requerimientos(PUT)
-async function putRequerimientos(id,params) {
-    const params = req.body;
-    const id = req.params.id; 
+// Actualizar Requerimientos(PUT) "arreglado y reconfigurado"
+async function putRequerimientos(nRequerimientos, params) {
+    try {
+        const data = await base_requerimientos.update({
+            nombre: params.nombre,
+            dotacion: params.dotacion,
+            estado: params.estado,
+            folio: params.folio,
+            centro_id: params.centro_id,
+            transporte_id: params.transporte_id,
+            bodeguero_id: params.bodeguero_id,
+            observaciones: params.observaciones,
+            deleted_at: params.deleted_at,
+            created_at: params.created_at,
+            updated_at: params.updated_at,
+        }, { where: { nRequerimientos: nRequerimientos, bActivo:1  } });
 
-
-try {
-    const data = await base_requerimientos.update(
-    {
-        nombre: params.nombre,
-        dotacion: params.dotacion,
-        estado: params.estado,
-        folio: params.folio,
-        centro_id: params.centro_id,
-        transporte_id: params.transporte_id,
-        bodeguero_id: params.bodeguero_id,
-        observaciones: params.observaciones,
-        deleted_at: params.deleted_at,
-        created_at: params.created_at,
-        updated_at: params.updated_at
-    },
-    { where: { id: params.codigo } });
-
-    if (data === null || data.length < 1) {
+        if (data === null || data.length < 1) {
+            return {
+                status: 500,
+                error: "Problema al actualizar requerimiento, verifique la informacion.",
+                data,
+            };
+        } else {
+            return {
+                status: 200,
+                error: "",
+                data:  data,
+            };
+        }
+    } catch (err) {
         return {
             status: 500,
-            error: "Problema al actualizar los requerimientos.",
-            data,
-        };
-    } else {
-        return {
-            status: 200,
-            error: "",
-            data:  data,
+            error: err,
+            data: err
         };
     }
-} catch (err) {
-    return {
-        status: 500,
-        error: err,
-        data: err
-    };
-}
 }
 
 // Eliminar Requerimientos(DELETE)

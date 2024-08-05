@@ -4,7 +4,7 @@
 const base_factura_electronicas = require('../../models/factura_electronicas');
 const sequelize = require('../../db/db_sequelize');
 const QueryTypes = require('sequelize');
-const base_factura_electronicas = require('../../models/factura_electronicas');
+
 
 // Obtener Factura_electronicas(GET)
 async function getAllFactura_electronicas(req) {
@@ -69,45 +69,39 @@ async function postFactura_electronicas(req) {
 }
 }
 
-// Actualizar Factura_electronicas(PUT)
-async function putFactura_electronicas(id,params) {
-    const params = req.body;
-    const id = req.params.id; 
+// Actualizar Factura_electronicas(PUT) "arreglado y reconfigurado"
+async function putFactura_electronicas(nFactura_electronicas, params) {
+    try {
+        const data = await base_factura_electronicas.update({
+            cierre_id: params.cierre_id,
+            fecha: params.fecha,
+            folio: params.folio,
+            monto: params.monto,
+            documento: params.documento,
+            created_at: params.created_at,
+            updated_at: params.updated_at,
+        }, { where: { nFactura_electronicas: nFactura_electronicas, bActivo:1  } });
 
-
-try {
-    const data = await base_factura_electronicas.update(
-    {
-        cierre_id: params.cierre_id,
-        fecha: params.fecha,
-        folio: params.folio,
-        monto: params.monto,
-        documento: params.documento,
-        created_at: params.created_at,
-        updated_at: params.updated_at
-    },
-    { where: { id: params.codigo } });
-
-    if (data === null || data.length < 1) {
+        if (data === null || data.length < 1) {
+            return {
+                status: 500,
+                error: "Problema al actualizar factura electronica, verifique la informacion.",
+                data,
+            };
+        } else {
+            return {
+                status: 200,
+                error: "",
+                data:  data,
+            };
+        }
+    } catch (err) {
         return {
             status: 500,
-            error: "Problema al actualizar la factura electronica.",
-            data,
-        };
-    } else {
-        return {
-            status: 200,
-            error: "",
-            data:  data,
+            error: err,
+            data: err
         };
     }
-} catch (err) {
-    return {
-        status: 500,
-        error: err,
-        data: err
-    };
-}
 }
 
 // Eliminar Factura_electronicas(DELETE)

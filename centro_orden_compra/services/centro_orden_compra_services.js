@@ -4,7 +4,7 @@
 const base_centro_orden_compra = require('../../models/centro_orden_compra');
 const sequelize = require('../../db/db_sequelize');
 const QueryTypes = require('sequelize');
-const base_centro_orden_compra = require('../../models/centro_orden_compra');
+
 
 // Obtener Centro_orden_compra(GET)
 async function getAllCentro_orden_compra(req) {
@@ -68,43 +68,38 @@ async function postCentro_orden_compra(req) {
 }
 
 // Actualizar Centro_orden_compra(PUT)
-async function putCentro_orden_compra(id,params) {
-    const params = req.body;
-    const id = req.params.id; 
+async function putCentro_orden_compra(nCentro_orden_compra, params) {
+    try {
+        const data = await base_centro_orden_compra.update({
+            centro_id: params.centro_id,
+            orden_compra_id: params.orden_compra_id,
+            monto: params.monto,
+            created_at: params.created_at,
+            updated_at: params.updated_at,
+        }, { where: { nCentro_orden_compra: nCentro_orden_compra, bActivo:1  } });
 
-
-try {
-    const data = await base_centro_orden_compra.update(
-    {
-        nota_credito_tributaria_id: params.nota_credito_tributaria_id,
-        centro_id: params.centro_id,
-        monto: params.monto,
-        created_at: params.created_at,
-        updated_at: params.updated_at
-    },
-    { where: { id: params.codigo } });
-
-    if (data === null || data.length < 1) {
+        if (data === null || data.length < 1) {
+            return {
+                status: 500,
+                error: "Problema al actualizar orden de compra, verifique la informacion.",
+                data,
+            };
+        } else {
+            return {
+                status: 200,
+                error: "",
+                data:  data,
+            };
+        }
+    } catch (err) {
         return {
             status: 500,
-            error: "Problema al actualizar la orden de compra.",
-            data,
-        };
-    } else {
-        return {
-            status: 200,
-            error: "",
-            data:  data,
+            error: err,
+            data: err
         };
     }
-} catch (err) {
-    return {
-        status: 500,
-        error: err,
-        data: err
-    };
 }
-}
+
 
 // Eliminar Centro_orden_compra(DELETE)
 async function deleteCentro_orden_compra(nCentro_orden_compra) {

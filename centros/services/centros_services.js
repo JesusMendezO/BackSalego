@@ -4,7 +4,6 @@
 const base_centros = require('../../models/centros');
 const sequelize = require('../../db/db_sequelize');
 const QueryTypes = require('sequelize');
-const base_centros = require('../../models/centros');
 
 // Obtener Centros(GET)
 async function getAllCentros(req) {
@@ -73,49 +72,43 @@ async function postCentros(req) {
 }
 }
 
-// Actualizar Centros(PUT)
-async function putCentros(id,params) {
-    const params = req.body;
-    const id = req.params.id; 
+// Actualizar Centros(PUT) "arreglado y reconfigurado"
+async function putCentros(nCentros, params) {
+    try {
+        const data = await base_centros.update({
+            empresa_id: params.empresa_id,
+            nombre: params.nombre,
+            direccion: params.direccion,
+            comuna: params.comuna,
+            ciudad: params.ciudad,
+            zona: params.zona,
+            habilitado: params.habilitado,
+            dotacion: params.dotacion,
+            deleted_at: params.deleted_at,
+            created_at: params.created_at,
+            updated_at: params.updated_at,
+        }, { where: { nCentros: nCentros, bActivo:1  } });
 
-
-try {
-    const data = await base_centros.update(
-    {
-        empresa_id: params.empresa_id,
-        nombre: params.nombre,
-        direccion: params.direccion,
-        comuna: params.comuna,
-        ciudad: params.ciudad,
-        zona: params.zona,
-        habilitado: params.habilitado,
-        dotacion: params.dotacion,
-        deleted_at: params.deleted_at,
-        created_at: params.created_at,
-        updated_at: params.updated_at
-    },
-    { where: { id: params.codigo } });
-
-    if (data === null || data.length < 1) {
+        if (data === null || data.length < 1) {
+            return {
+                status: 500,
+                error: "Problema al actualizar centro, verifique la informacion.",
+                data,
+            };
+        } else {
+            return {
+                status: 200,
+                error: "",
+                data:  data,
+            };
+        }
+    } catch (err) {
         return {
             status: 500,
-            error: "Problema al actualizar el centros.",
-            data,
-        };
-    } else {
-        return {
-            status: 200,
-            error: "",
-            data:  data,
+            error: err,
+            data: err
         };
     }
-} catch (err) {
-    return {
-        status: 500,
-        error: err,
-        data: err
-    };
-}
 }
 
 // Eliminar Centros(DELETE)

@@ -70,47 +70,41 @@ async function postEmpresas(req) {
 }
 }
 
-// Actualizar Empresas(PUT)
-async function putEmpresas(id,params) {
-    const params = req.body;
-    const id = req.params.id; 
+// Actualizar Empresas(PUT) "arreglado y reconfigurado"
+async function putEmpresas(nEmpresas, params) {
+    try {
+        const data = await base_empresas.update({
+            holding_id: params.holding_id,
+            razon_social: params.razon_social,
+            giro: params.giro,
+            rut: params.rut,
+            direccion: params.direccion,
+            habilitado: params.habilitado,
+            deleted_at: params.deleted_at,
+            created_at: params.created_at,
+            updated_at: params.updated_at,
+        }, { where: { nEmpresas: nEmpresas, bActivo:1  } });
 
-
-try {
-    const data = await base_empresas.update(
-    {
-        holding_id: params.holding_id,
-        razon_social: params.razon_social,
-        giro: params.giro,
-        rut: params.rut,
-        direccion: params.direccion,
-        habilitado: params.habilitado,
-        deleted_at: params.deleted_at,
-        created_at: params.created_at,
-        updated_at: params.updated_at
-    },
-    { where: { id: params.codigo } });
-
-    if (data === null || data.length < 1) {
+        if (data === null || data.length < 1) {
+            return {
+                status: 500,
+                error: "Problema al actualizar empresas, verifique la informacion.",
+                data,
+            };
+        } else {
+            return {
+                status: 200,
+                error: "",
+                data:  data,
+            };
+        }
+    } catch (err) {
         return {
             status: 500,
-            error: "Problema al actualizar la empresa.",
-            data,
-        };
-    } else {
-        return {
-            status: 200,
-            error: "",
-            data:  data,
+            error: err,
+            data: err
         };
     }
-} catch (err) {
-    return {
-        status: 500,
-        error: err,
-        data: err
-    };
-}
 }
 
 // Eliminar Empresas(DELETE)

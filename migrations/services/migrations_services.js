@@ -4,7 +4,7 @@
 const base_migrations = require('../../models/migrations');
 const sequelize = require('../../db/db_sequelize');
 const QueryTypes = require('sequelize');
-const base_migrations = require('../../models/migrations');
+
 
 // Obtener Migrations(GET)
 async function getAllMigrations(req) {
@@ -64,41 +64,34 @@ async function postMigrations(req) {
 }
 }
 
-// Actualizar Migrations(PUT)
-async function putMigrations(id,params) {
-    const params = req.body;
-    const id = req.params.id; 
+// Actualizar Migrations(PUT) "arreglado y reconfigurado"
+async function putMigrations(nMigrations, params) {
+    try {
+        const data = await base_migrations.update({
+            migration: params.migration,
+            batch: params.batch,
+        }, { where: { nMigrations: nMigrations, bActivo:1  } });
 
-
-try {
-    const data = await base_migrations.update(
-    {
-        nombre: params.nombre,
-        migration: params.migration,
-        batch: params.batch
-    },
-    { where: { id: params.codigo } });
-
-    if (data === null || data.length < 1) {
+        if (data === null || data.length < 1) {
+            return {
+                status: 500,
+                error: "Problema al actualizar migration, verifique la informacion.",
+                data,
+            };
+        } else {
+            return {
+                status: 200,
+                error: "",
+                data:  data,
+            };
+        }
+    } catch (err) {
         return {
             status: 500,
-            error: "Problema al actualizar el migrations.",
-            data,
-        };
-    } else {
-        return {
-            status: 200,
-            error: "",
-            data:  data,
+            error: err,
+            data: err
         };
     }
-} catch (err) {
-    return {
-        status: 500,
-        error: err,
-        data: err
-    };
-}
 }
 
 // Eliminar Migrations(DELETE)

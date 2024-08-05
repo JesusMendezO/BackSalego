@@ -4,7 +4,7 @@
 const base_jobs = require('../../models/jobs');
 const sequelize = require('../../db/db_sequelize');
 const QueryTypes = require('sequelize');
-const base_jobs = require('../../models/jobs');
+
 
 // Obtener Jobs(GET)
 async function getAllJobs(req) {
@@ -68,44 +68,38 @@ async function postJobs(req) {
 }
 }
 
-// Actualizar Jobs(PUT)
-async function putJobs(id,params) {
-    const params = req.body;
-    const id = req.params.id; 
+// Actualizar Jobs(PUT) "arreglado y reconfigurado"
+async function putJobs(nJobs, params) {
+    try {
+        const data = await base_jobs.update({
+            queue: params.queue,
+            payload: params.payload,
+            attempts: params.attempts,
+            reserved_at: params.reserved_at,
+            available_at: params.available_at,
+            created_at: params.created_at,
+        }, { where: { nJobs: nJobs, bActivo:1  } });
 
-
-try {
-    const data = await base_jobs.update(
-    {
-        queue: params.queue,
-        payload: params.payload,
-        attempts: params.attempts,
-        reserved_at: params.reserved_at,
-        available_at: params.available_at,
-        created_at: params.created_at
-    },
-    { where: { id: params.codigo } });
-
-    if (data === null || data.length < 1) {
+        if (data === null || data.length < 1) {
+            return {
+                status: 500,
+                error: "Problema al actualizar job, verifique la informacion.",
+                data,
+            };
+        } else {
+            return {
+                status: 200,
+                error: "",
+                data:  data,
+            };
+        }
+    } catch (err) {
         return {
             status: 500,
-            error: "Problema al actualizar el jobs.",
-            data,
-        };
-    } else {
-        return {
-            status: 200,
-            error: "",
-            data:  data,
+            error: err,
+            data: err
         };
     }
-} catch (err) {
-    return {
-        status: 500,
-        error: err,
-        data: err
-    };
-}
 }
 
 // Eliminar Jobs(DELETE)

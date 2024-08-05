@@ -4,7 +4,6 @@
 const base_carga_inicials = require('../../models/carga_inicials');
 const sequelize = require('../../db/db_sequelize');
 const QueryTypes = require('sequelize');
-const base_carga_inicials = require('../../models/carga_inicials');
 
 // Obtener Carga_inicials(GET)
 async function getAllCarga_inicials(req) {
@@ -68,44 +67,38 @@ async function postCarga_inicials(req) {
 }
 }
 
-// Actualizar Carga_inicials(PUT)
-async function putCarga_inicials(id,params) {
-    const params = req.body;
-    const id = req.params.id; 
+// Actualizar Carga_inicials(PUT) "arreglado y reconfigurado"
+async function putCarga_inicials(nCarga_inicials, params) {
+    try {
+        const data = await base_carga_inicials.update({
+            bidon_id: params.bidon_id,
+            cantidad: params.cantidad,
+            fecha_ingreso: params.fecha_ingreso,
+            deleted_at: params.deleted_at,
+            created_at: params.created_at,
+            updated_at: params.updated_at,
+        }, { where: { nCarga_inicials: nCarga_inicials, bActivo:1  } });
 
-
-try {
-    const data = await base_carga_inicials.update(
-    {
-        bidon_id: params.bidon_id,
-        cantidad: params.cantidad,
-        fecha_ingreso: params.fecha_ingreso,
-        deleted_at: params.deleted_at,
-        created_at: params.created_at,
-        updated_at: params.updated_at
-    },
-    { where: { id: params.codigo } });
-
-    if (data === null || data.length < 1) {
+        if (data === null || data.length < 1) {
+            return {
+                status: 500,
+                error: "Problema al actualizar carga_inicial, verifique la informacion.",
+                data,
+            };
+        } else {
+            return {
+                status: 200,
+                error: "",
+                data:  data,
+            };
+        }
+    } catch (err) {
         return {
             status: 500,
-            error: "Problema al actualizar el carga_inicials.",
-            data,
-        };
-    } else {
-        return {
-            status: 200,
-            error: "",
-            data:  data,
+            error: err,
+            data: err
         };
     }
-} catch (err) {
-    return {
-        status: 500,
-        error: err,
-        data: err
-    };
-}
 }
 
 // Eliminar Carga_inicials(DELETE)

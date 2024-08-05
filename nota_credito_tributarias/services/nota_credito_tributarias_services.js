@@ -4,7 +4,7 @@
 const base_nota_credito_tributarias = require('../../models/nota_credito_tributarias');
 const sequelize = require('../../db/db_sequelize');
 const QueryTypes = require('sequelize');
-const base_nota_credito_tributarias = require('../../models/nota_credito_tributarias');
+
 
 // Obtener Nota_credito_tributarias(GET)
 async function getAllNota_credito_tributarias(req) {
@@ -69,45 +69,39 @@ async function postNota_credito_tributarias(req) {
 }
 }
 
-// Actualizar Nota_credito_tributarias(PUT)
-async function putNota_credito_tributarias(id,params) {
-    const params = req.body;
-    const id = req.params.id; 
+// Actualizar Nota_credito_tributarias(PUT) "arreglado y reconfigurado"
+async function putNota_credito_tributarias(nNota_credito_tributarias, params) {
+    try {
+        const data = await base_nota_credito_tributarias.update({
+            cierre_id: params.cierre_id,
+            fecha: params.fecha,
+            folio: params.folio,
+            monto: params.monto,
+            documento: params.documento,
+            created_at: params.created_at,
+            updated_at: params.updated_at,
+        }, { where: { nNota_credito_tributarias: nNota_credito_tributarias, bActivo:1  } });
 
-
-try {
-    const data = await base_nota_credito_tributarias.update(
-    {
-        cierre_id: params.cierre_id,
-        fecha: params.fecha,
-        folio: params.folio,
-        monto: params.monto,
-        documento: params.documento,
-        created_at: params.created_at,
-        updated_at: params.updated_at
-    },
-    { where: { id: params.codigo } });
-
-    if (data === null || data.length < 1) {
+        if (data === null || data.length < 1) {
+            return {
+                status: 500,
+                error: "Problema al actualizar nota credito tributaria, verifique la informacion.",
+                data,
+            };
+        } else {
+            return {
+                status: 200,
+                error: "",
+                data:  data,
+            };
+        }
+    } catch (err) {
         return {
             status: 500,
-            error: "Problema al actualizar la nota de credito tributaria.",
-            data,
-        };
-    } else {
-        return {
-            status: 200,
-            error: "",
-            data:  data,
+            error: err,
+            data: err
         };
     }
-} catch (err) {
-    return {
-        status: 500,
-        error: err,
-        data: err
-    };
-}
 }
 
 // Eliminar Nota_credito_tributarias(DELETE)

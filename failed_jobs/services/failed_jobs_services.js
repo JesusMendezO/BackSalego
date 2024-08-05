@@ -4,7 +4,7 @@
 const base_failed_jobs = require('../../models/failed_jobs');
 const sequelize = require('../../db/db_sequelize');
 const QueryTypes = require('sequelize');
-const base_failed_jobs = require('../../models/failed_jobs');
+
 
 // Obtener Failed_jobs(GET)
 async function getAllFailed_jobs(req) {
@@ -67,43 +67,37 @@ async function postFailed_jobs(req) {
 }
 }
 
-// Actualizar Failed_jobs(PUT)
-async function putFailed_jobs(id,params) {
-    const params = req.body;
-    const id = req.params.id; 
+// Actualizar Failed_jobs(PUT) "arreglado y reconfigurado"
+async function putFailed_jobs(nFailed_jobs, params) {
+    try {
+        const data = await base_failed_jobs.update({
+            connection: params.connection,
+            queue: params.queue,
+            payload: params.payload,
+            exception: params.exception,
+            failed_at: params.failed_at,
+        }, { where: { nFailed_jobs: nFailed_jobs, bActivo:1  } });
 
-
-try {
-    const data = await base_failed_jobs.update(
-    {
-        connection: params.connection,
-        queue: params.queue,
-        payload: params.payload,
-        exception: params.exception,
-        failed_at: params.failed_at
-    },
-    { where: { id: params.codigo } });
-
-    if (data === null || data.length < 1) {
+        if (data === null || data.length < 1) {
+            return {
+                status: 500,
+                error: "Problema al actualizar failed jobs, verifique la informacion.",
+                data,
+            };
+        } else {
+            return {
+                status: 200,
+                error: "",
+                data:  data,
+            };
+        }
+    } catch (err) {
         return {
             status: 500,
-            error: "Problema al actualizar el failed jobs.",
-            data,
-        };
-    } else {
-        return {
-            status: 200,
-            error: "",
-            data:  data,
+            error: err,
+            data: err
         };
     }
-} catch (err) {
-    return {
-        status: 500,
-        error: err,
-        data: err
-    };
-}
 }
 
 // Eliminar Failed_jobs(DELETE)

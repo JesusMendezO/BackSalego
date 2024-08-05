@@ -4,7 +4,7 @@
 const base_cierres = require('../../models/cierres');
 const sequelize = require('../../db/db_sequelize');
 const QueryTypes = require('sequelize');
-const base_cierres = require('../../models/cierres');
+
 
 // Obtener Cierres(GET)
 async function getAllCierres(req) {
@@ -69,45 +69,39 @@ async function postCierres(req) {
 }
 }
 
-// Actualizar Cierres(PUT)
-async function putCierres(id,params) {
-    const params = req.body;
-    const id = req.params.id; 
+// Actualizar Cierres(PUT) "arreglado y reconfigurado"
+async function putCierres(nCierres, params) {
+    try {
+        const data = await base_cierres.update({
+            empresa_id: params.empresa_id,
+            desde: params.desde,
+            hasta: params.hasta,
+            monto:params.monto,
+            created_at: params.created_at,
+            updated_at: params.updated_at,
+            deleted_at: params.deleted_at,
+        }, { where: { nCierres: nCierres, bActivo:1  } });
 
-
-try {
-    const data = await base_cierres.update(
-    {
-        empresa_id: params.empresa_id,
-        desde: params.desde,
-        hasta: params.hasta,
-        monto:params.monto,
-        created_at: params.created_at,
-        updated_at: params.updated_at,
-        deleted_at: params.deleted_at
-    },
-    { where: { id: params.codigo } });
-
-    if (data === null || data.length < 1) {
+        if (data === null || data.length < 1) {
+            return {
+                status: 500,
+                error: "Problema al actualizar cierre, verifique la informacion.",
+                data,
+            };
+        } else {
+            return {
+                status: 200,
+                error: "",
+                data:  data,
+            };
+        }
+    } catch (err) {
         return {
             status: 500,
-            error: "Problema al actualizar el cierre.",
-            data,
-        };
-    } else {
-        return {
-            status: 200,
-            error: "",
-            data:  data,
+            error: err,
+            data: err
         };
     }
-} catch (err) {
-    return {
-        status: 500,
-        error: err,
-        data: err
-    };
-}
 }
 
 // Eliminar Cierres(DELETE)

@@ -4,7 +4,7 @@
 const base_nota_creditos = require('../../models/nota_creditos');
 const sequelize = require('../../db/db_sequelize');
 const QueryTypes = require('sequelize');
-const base_nota_creditos = require('../../models/nota_creditos');
+
 
 // Obtener Nota_creditos(GET)
 async function getAllNota_creditos(req) {
@@ -70,46 +70,40 @@ async function postNota_creditos(req) {
 }
 }
 
-// Actualizar Nota_creditos(PUT)
-async function putNota_creditos(id,params) {
-    const params = req.body;
-    const id = req.params.id; 
+// Actualizar Nota_creditos(PUT) "arreglado y reconfigurado"
+async function putNota_creditos(nNota_creditos, params) {
+    try {
+        const data = await base_nota_creditos.update({
+            bidon_id: params.bidon_id,
+            cantidad: params.cantidad,
+            fecha_ingreso: params.fecha_ingreso,
+            fecha_documento: params.fecha_documento,
+            folio_documento: params.folio_documento,
+            deleted_at: params.deleted_at,
+            created_at: params.created_at,
+            updated_at: params.updated_at,
+        }, { where: { nNota_creditos: nNota_creditos, bActivo:1  } });
 
-
-try {
-    const data = await base_nota_creditos.update(
-    {
-        bidon_id: params.bidon_id,
-        cantidad: params.cantidad,
-        fecha_ingreso: params.fecha_ingreso,
-        fecha_documento: params.fecha_documento,
-        folio_documento: params.folio_documento,
-        deleted_at: params.deleted_at,
-        created_at: params.created_at,
-        updated_at: params.updated_at
-    },
-    { where: { id: params.codigo } });
-
-    if (data === null || data.length < 1) {
+        if (data === null || data.length < 1) {
+            return {
+                status: 500,
+                error: "Problema al actualizar nota credito, verifique la informacion.",
+                data,
+            };
+        } else {
+            return {
+                status: 200,
+                error: "",
+                data:  data,
+            };
+        }
+    } catch (err) {
         return {
             status: 500,
-            error: "Problema al actualizar la nota de credito.",
-            data,
-        };
-    } else {
-        return {
-            status: 200,
-            error: "",
-            data:  data,
+            error: err,
+            data: err
         };
     }
-} catch (err) {
-    return {
-        status: 500,
-        error: err,
-        data: err
-    };
-}
 }
 
 // Eliminar Nota_creditos(DELETE)

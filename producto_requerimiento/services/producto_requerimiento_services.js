@@ -4,7 +4,7 @@
 const base_producto_requerimiento = require('../../models/producto_requerimiento');
 const sequelize = require('../../db/db_sequelize');
 const QueryTypes = require('sequelize');
-const base_producto_requerimiento = require('../../models/producto_requerimiento');
+
 
 // Obtener Producto_requerimiento(GET)
 async function getAllProducto_requerimiento(req) {
@@ -71,52 +71,41 @@ async function postProducto_requerimiento(req) {
 }
 }
 
-// Actualizar Producto_requerimiento(PUT)
-async function putProducto_requerimiento(id,params) {
-    const params = req.body;
-    const id = req.params.id; 
+// Actualizar Producto_requerimiento(PUT) "arreglado y reconfigurado"
+async function putProducto_requerimiento(nProducto_requerimiento, params) {
+    try {
+        const data = await base_producto_requerimiento.update({
+            producto_id: params.producto_id,
+            requerimiento_id: params.requerimiento_id,
+            cantidad: params.cantidad,
+            real: params.real,
+            precio: params.precio,
+            observacion: params.observacion,
+            fecha_vencimiento: params.fecha_vencimiento,
+            created_at: params.created_at,
+            updated_at: params.updated_at,
+        }, { where: { nProducto_requerimiento: nProducto_requerimiento, bActivo:1  } });
 
-
-try {
-    const data = await base_producto_requerimiento.update(
-    {
-        empresa_id: params.empresa_id,
-        sku: params.sku,
-        detalle: params.detalle,
-        costo: params.costo,
-        venta: params.venta,
-        desde: params.desde,
-        hasta: params.hasta,
-        deleted_at: params.deleted_at,
-        created_at: params.created_at,
-        updated_at: params.updated_at,
-        marca: params.marca,
-        familia: params.familia,
-        reemplazo: params.reemplazo,
-        formato: params.formato
-    },
-    { where: { id: params.codigo } });
-
-    if (data === null || data.length < 1) {
+        if (data === null || data.length < 1) {
+            return {
+                status: 500,
+                error: "Problema al actualizar producto requerimiento, verifique la informacion.",
+                data,
+            };
+        } else {
+            return {
+                status: 200,
+                error: "",
+                data:  data,
+            };
+        }
+    } catch (err) {
         return {
             status: 500,
-            error: "Problema al actualizar el requerimiento del producto.",
-            data,
-        };
-    } else {
-        return {
-            status: 200,
-            error: "",
-            data:  data,
+            error: err,
+            data: err
         };
     }
-} catch (err) {
-    return {
-        status: 500,
-        error: err,
-        data: err
-    };
-}
 }
 
 // Eliminar Producto_requerimiento(DELETE)

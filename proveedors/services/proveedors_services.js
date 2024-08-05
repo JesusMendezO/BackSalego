@@ -4,7 +4,7 @@
 const base_proveedors = require('../../models/proveedors');
 const sequelize = require('../../db/db_sequelize');
 const QueryTypes = require('sequelize');
-const base_proveedors = require('../../models/proveedors');
+
 
 // Obtener Proveedors(GET)
 async function getAllProveedors(req) {
@@ -72,48 +72,42 @@ async function postProveedors(req) {
 }
 }
 
-// Actualizar Proveedors(PUT)
-async function putProveedors(id,params) {
-    const params = req.body;
-    const id = req.params.id; 
+// Actualizar Proveedors(PUT) "arreglado y reconfigurado"
+async function putProveedors(nProveedors, params) {
+    try {
+        const data = await base_proveedors.update({
+            razon_social: params.razon_social,
+            rut: params.rut,
+            direccion: params.direccion,
+            comuna: params.comuna,
+            correo: params.correo,
+            telefono: params.telefono,
+            giro: params.giro,
+            deleted_at: params.deleted_at,
+            created_at: params.created_at,
+            updated_at: params.updated_at,
+        }, { where: { nProveedors: nProveedors, bActivo:1  } });
 
-
-try {
-    const data = await base_proveedors.update(
-    {
-        razon_social: params.razon_social,
-        rut: params.rut,
-        direccion: params.direccion,
-        comuna: params.comuna,
-        correo: params.correo,
-        telefono: params.telefono,
-        giro: params.giro,
-        deleted_at: params.deleted_at,
-        created_at: params.created_at,
-        updated_at: params.updated_at
-    },
-    { where: { id: params.codigo } });
-
-    if (data === null || data.length < 1) {
+        if (data === null || data.length < 1) {
+            return {
+                status: 500,
+                error: "Problema al actualizar proveedors, verifique la informacion.",
+                data,
+            };
+        } else {
+            return {
+                status: 200,
+                error: "",
+                data:  data,
+            };
+        }
+    } catch (err) {
         return {
             status: 500,
-            error: "Problema al actualizar el proveedor.",
-            data,
-        };
-    } else {
-        return {
-            status: 200,
-            error: "",
-            data:  data,
+            error: err,
+            data: err
         };
     }
-} catch (err) {
-    return {
-        status: 500,
-        error: err,
-        data: err
-    };
-}
 }
 
 // Eliminar Proveedors(DELETE)

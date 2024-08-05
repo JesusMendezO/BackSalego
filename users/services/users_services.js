@@ -4,7 +4,7 @@
 const base_users = require('../../models/users');
 const sequelize = require('../../db/db_sequelize');
 const QueryTypes = require('sequelize');
-const base_users = require('../../models/users');
+
 
 // Obtener Users(GET)
 async function getAllUsers(req) {
@@ -73,49 +73,43 @@ async function postUsers(req) {
 }
 }
 
-// Actualizar Users(PUT)
-async function putUsers(id,params) {
-    const params = req.body;
-    const id = req.params.id; 
+// Actualizar Users(PUT) "arreglado y reconfigurado"
+async function putUsers(nUsers, params) {
+    try {
+        const data = await base_users.update({
+            name: params.name,
+            email: params.email,
+            email_verified_at: params.email_verified_at,
+            password: params.password,
+            userable_type: params.userable_type,
+            userable_id: params.userable_id,
+            logistica: params.logistica,
+            remember_token: params.remember_token,
+            created_at: params.created_at,
+            updated_at: params.updated_at,
+            deleted_at: params.deleted_at,
+        }, { where: { nUsers: nUsers, bActivo:1  } });
 
-
-try {
-    const data = await base_users.update(
-    {
-        name: params.name,
-        email: params.email,
-        email_verified_at: params.email_verified_at,
-        password: params.password,
-        userable_type: params.userable_type,
-        userable_id: params.userable_id,
-        logistica: params.logistica,
-        remember_token: params.remember_token,
-        created_at: params.created_at,
-        updated_at: params.updated_at,
-        deleted_at: params.deleted_at
-    },
-    { where: { id: params.codigo } });
-
-    if (data === null || data.length < 1) {
+        if (data === null || data.length < 1) {
+            return {
+                status: 500,
+                error: "Problema al actualizar users, verifique la informacion.",
+                data,
+            };
+        } else {
+            return {
+                status: 200,
+                error: "",
+                data:  data,
+            };
+        }
+    } catch (err) {
         return {
             status: 500,
-            error: "Problema al actualizar el users.",
-            data,
-        };
-    } else {
-        return {
-            status: 200,
-            error: "",
-            data:  data,
+            error: err,
+            data: err
         };
     }
-} catch (err) {
-    return {
-        status: 500,
-        error: err,
-        data: err
-    };
-}
 }
 
 // Eliminar Users(DELETE)
